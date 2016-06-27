@@ -4,7 +4,7 @@ LSM(Linux Security Module) Template
 # What is this for?
 This is just skelton/template for creating new security module as LSM(Linux Security Module).
 
-# How to use it.
+# Installation
 1. Download 1 tar.gz file(lsm_template.tar.gz).
 2. Extract it in your any directory.
 3. Move lsm_tmp directory under kernel src(linux/security).
@@ -13,4 +13,4 @@ This is just skelton/template for creating new security module as LSM(Linux Secu
 6. Play it!
 
 # Release note
-0.1 Just create template for linux-4.6.
+2016/06/27 Create template for linux-4.6.
