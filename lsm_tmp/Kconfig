@@ -1,0 +1,7 @@
+config SECURITY_LSM_TMP
+	bool "LSM Template for creating new LSM Module"
+	depends on SECURITY
+	default n
+	help
+	  This is template for creating new LSM module.
+
