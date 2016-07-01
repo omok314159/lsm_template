@@ -58,7 +58,6 @@
 #include <linux/audit.h>
 #include <linux/lsm_audit.h>
 #include <linux/string.h>
-#include <linux/selinux.h>
 #include <linux/mutex.h>
 #include <linux/posix-timers.h>
 #include <linux/syslog.h>
@@ -66,6 +65,8 @@
 #include <linux/export.h>
 #include <linux/msg.h>
 #include <linux/shm.h>
+#include <net/xfrm.h>
+#include <linux/xfrm.h>
 
 #ifdef CONFIG_SECURITY_LSM_TMP
 int lsm_tmp_enabled = CONFIG_SECURITY_LSM_TMP;
@@ -727,6 +728,79 @@ static int lsm_tmp_tun_dev_open(void *security)
 	return 0;
 }
 
+#ifdef CONFIG_SECURITY_NETWORK_XFRM
+static void lsm_tmp_xfrm_free(struct xfrm_sec_ctx *ctx)
+{
+        if (!ctx)
+                return;
+
+        kfree(ctx);
+}
+
+int lsm_tmp_xfrm_policy_alloc(struct xfrm_sec_ctx **ctxp,
+                              struct xfrm_user_sec_ctx *uctx,
+                              gfp_t gfp)
+{
+        return 0;
+}
+
+int lsm_tmp_xfrm_policy_clone(struct xfrm_sec_ctx *old_ctx,
+                              struct xfrm_sec_ctx **new_ctxp)
+{
+	return 0;
+}
+
+void lsm_tmp_xfrm_policy_free(struct xfrm_sec_ctx *ctx)
+{
+        lsm_tmp_xfrm_free(ctx);
+}
+
+int lsm_tmp_xfrm_policy_delete(struct xfrm_sec_ctx *ctx)
+{
+        return 0;
+}
+
+int lsm_tmp_xfrm_state_alloc(struct xfrm_state *x,
+                             struct xfrm_user_sec_ctx *uctx)
+{
+        return 0;
+}
+
+int lsm_tmp_xfrm_state_alloc_acquire(struct xfrm_state *x,
+                                     struct xfrm_sec_ctx *polsec, u32 secid)
+{
+	return 0;
+}
+
+void lsm_tmp_xfrm_state_free(struct xfrm_state *x)
+{
+        lsm_tmp_xfrm_free(x->security);
+}
+
+int lsm_tmp_xfrm_state_delete(struct xfrm_state *x)
+{
+	return 0;
+}
+
+int lsm_tmp_xfrm_policy_lookup(struct xfrm_sec_ctx *ctx, u32 fl_secid, u8 dir)
+{
+	return 0;
+}
+
+int lsm_tmp_xfrm_state_pol_flow_match(struct xfrm_state *x,
+                                      struct xfrm_policy *xp,
+                                      const struct flowi *fl)
+{
+	return 0;
+}
+
+int lsm_tmp_xfrm_decode_session(struct sk_buff *skb, u32 *sid, int ckall)
+{
+	return 0;
+}
+
+#endif
+
 static int lsm_tmp_netlink_send(struct sock *sk, struct sk_buff *skb)
 {
         return 0;
@@ -1145,6 +1219,23 @@ static struct security_hook_list lsm_tmp_hooks[] = {
         LSM_HOOK_INIT(tun_dev_attach_queue, lsm_tmp_tun_dev_attach_queue),
         LSM_HOOK_INIT(tun_dev_attach, lsm_tmp_tun_dev_attach),
         LSM_HOOK_INIT(tun_dev_open, lsm_tmp_tun_dev_open),
+
+#ifdef CONFIG_SECURITY_NETWORK_XFRM
+        LSM_HOOK_INIT(xfrm_policy_alloc_security, lsm_tmp_xfrm_policy_alloc),
+        LSM_HOOK_INIT(xfrm_policy_clone_security, lsm_tmp_xfrm_policy_clone),
+        LSM_HOOK_INIT(xfrm_policy_free_security, lsm_tmp_xfrm_policy_free),
+        LSM_HOOK_INIT(xfrm_policy_delete_security, lsm_tmp_xfrm_policy_delete),
+        LSM_HOOK_INIT(xfrm_state_alloc, lsm_tmp_xfrm_state_alloc),
+        LSM_HOOK_INIT(xfrm_state_alloc_acquire,
+                        lsm_tmp_xfrm_state_alloc_acquire),
+        LSM_HOOK_INIT(xfrm_state_free_security, lsm_tmp_xfrm_state_free),
+        LSM_HOOK_INIT(xfrm_state_delete_security, lsm_tmp_xfrm_state_delete),
+        LSM_HOOK_INIT(xfrm_policy_lookup, lsm_tmp_xfrm_policy_lookup),
+        LSM_HOOK_INIT(xfrm_state_pol_flow_match,
+                        lsm_tmp_xfrm_state_pol_flow_match),
+        LSM_HOOK_INIT(xfrm_decode_session, lsm_tmp_xfrm_decode_session),
+#endif
+
 
 #ifdef CONFIG_KEYS
         LSM_HOOK_INIT(key_alloc, lsm_tmp_key_alloc),
