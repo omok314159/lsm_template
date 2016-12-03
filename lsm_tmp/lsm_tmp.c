@@ -206,7 +206,7 @@ static int lsm_tmp_sb_statfs(struct dentry *dentry)
 }
 
 static int lsm_tmp_mount(const char *dev_name,
-                         struct path *path,
+                         const struct path *path,
                          const char *type,
                          unsigned long flags,
                          void *data)
@@ -229,10 +229,9 @@ static void lsm_tmp_inode_free_security(struct inode *inode)
 }
 
 static int lsm_tmp_dentry_init_security(struct dentry *dentry, int mode,
-                                        struct qstr *name, void **ctx,
+                                        const struct qstr *name, void **ctx,
                                         u32 *ctxlen)
 {
-	printk("lsm_tmp: lsm_tmp_dentry_init_security called\n");
 	return 0;
 }
 
@@ -366,7 +365,6 @@ static void lsm_tmp_inode_getsecid(struct inode *inode, u32 *secid)
 static int lsm_tmp_file_permission(struct file *file, int mask)
 {
 	return 0;
-
 }
 
 static int lsm_tmp_file_alloc_security(struct file *file)
@@ -471,6 +469,12 @@ static int lsm_tmp_kernel_create_files_as(struct cred *new, struct inode *inode)
 static int lsm_tmp_kernel_module_request(char *kmod_name)
 {
         return 0;
+}
+
+static int lsm_tmp_kernel_read_file(struct file *file,
+                                    enum kernel_read_file_id id)
+{
+	return 0;
 }
 
 static int lsm_tmp_task_setpgid(struct task_struct *p, pid_t pgid)
@@ -1063,6 +1067,7 @@ static struct security_hook_list lsm_tmp_hooks[] = {
         LSM_HOOK_INIT(bprm_committing_creds, lsm_tmp_bprm_committing_creds),
         LSM_HOOK_INIT(bprm_committed_creds, lsm_tmp_bprm_committed_creds),
         LSM_HOOK_INIT(bprm_secureexec, lsm_tmp_bprm_secureexec),
+
         LSM_HOOK_INIT(sb_alloc_security, lsm_tmp_sb_alloc_security),
         LSM_HOOK_INIT(sb_free_security, lsm_tmp_sb_free_security),
         LSM_HOOK_INIT(sb_copy_data, lsm_tmp_sb_copy_data),
@@ -1127,6 +1132,7 @@ static struct security_hook_list lsm_tmp_hooks[] = {
         LSM_HOOK_INIT(kernel_act_as, lsm_tmp_kernel_act_as),
         LSM_HOOK_INIT(kernel_create_files_as, lsm_tmp_kernel_create_files_as),
         LSM_HOOK_INIT(kernel_module_request, lsm_tmp_kernel_module_request),
+        LSM_HOOK_INIT(kernel_read_file, lsm_tmp_kernel_read_file),
         LSM_HOOK_INIT(task_setpgid, lsm_tmp_task_setpgid),
         LSM_HOOK_INIT(task_getpgid, lsm_tmp_task_getpgid),
         LSM_HOOK_INIT(task_getsid, lsm_tmp_task_getsid),
@@ -1235,7 +1241,6 @@ static struct security_hook_list lsm_tmp_hooks[] = {
                         lsm_tmp_xfrm_state_pol_flow_match),
         LSM_HOOK_INIT(xfrm_decode_session, lsm_tmp_xfrm_decode_session),
 #endif
-
 
 #ifdef CONFIG_KEYS
         LSM_HOOK_INIT(key_alloc, lsm_tmp_key_alloc),
