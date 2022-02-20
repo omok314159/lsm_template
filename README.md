@@ -12,5 +12,6 @@ This is just skelton/template for creating new security module as LSM(Linux Secu
 5. Play it!
 
 # Release note
-2016/06/27 Create template for linux-4.6. 
+2016/06/27 Create template for linux-4.6.  
+
 2022/02/20 I'll update the template for current 5.16 soon. 
